@@ -35,7 +35,7 @@ module SalesforceBulk
       xml += "    </n1:login>"
       xml += "  </env:Body>"
       xml += "</env:Envelope>"
-      
+
       headers = Hash['Content-Type' => 'text/xml; charset=utf-8', 'SOAPAction' => 'login']
 
       response = post_xml(@@LOGIN_HOST, @@LOGIN_PATH, xml, headers)
@@ -49,21 +49,14 @@ module SalesforceBulk
     end
 
     def post_xml(host, path, xml, headers)
-
       host = host || @@INSTANCE_HOST
 
       if host != @@LOGIN_HOST # Not login, need to add session id to header
         headers['X-SFDC-Session'] = @session_id;
-        #puts "session id is: #{@session_id} --- #{headers.inspect}\n"
         path = "#{@@PATH_PREFIX}#{path}"
       end
 
-      #puts "#{host} -- #{path} -- #{headers.inspect}\n"
-
-      http = Net::HTTP.new(host)
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      resp = http.post(path, xml, headers)
-      return resp.body
+      https(host).post(path, xml, headers).body
     end
 
     def get_request(host, path, headers)
@@ -74,10 +67,14 @@ module SalesforceBulk
         headers['X-SFDC-Session'] = @session_id;
       end
 
-      http = Net::HTTP.new(host)
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      resp = http.get(path, headers)
-      return resp.body
+      https(host).get(path, headers).body
+    end
+
+    def https(host)
+      req = Net::HTTP.new(host, 443)
+      req.use_ssl = true
+      req.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      req
     end
 
     def parse_instance()
