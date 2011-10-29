@@ -4,19 +4,18 @@ module SalesforceBulk
 
     @@XML_HEADER = '<?xml version="1.0" encoding="utf-8" ?>'
     @@API_VERSION = nil
-    @@LOGIN_HOST = 'login.salesforce.com'
     @@INSTANCE_HOST = nil # Gets set in login()
 
-    def initialize(username, password, api_version)
-      @username = username
-      @password = password
-      @session_id = nil
-      @server_url = nil
-      @instance = nil
+    def initialize(username, password, api_version, opts={})
+      @username     = username
+      @password     = password
+      @session_id   = nil
+      @server_url   = nil
+      @instance     = nil
       @@API_VERSION = api_version
-      @@LOGIN_PATH = "/services/Soap/u/#{@@API_VERSION}"
+      @@LOGIN_PATH  = "/services/Soap/u/#{@@API_VERSION}"
       @@PATH_PREFIX = "/services/async/#{@@API_VERSION}/"
-
+      @@LOGIN_HOST  = "#{opts[:test] ? 'test' : 'live'}.salesforce.com"
       login()
     end
 

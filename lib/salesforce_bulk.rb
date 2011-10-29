@@ -11,8 +11,8 @@ module SalesforceBulk
 
     @@SALESFORCE_API_VERSION = '23.0'
 
-    def initialize(username, password)
-      @connection = SalesforceBulk::Connection.new(username, password, @@SALESFORCE_API_VERSION)
+    def initialize(username, password, opts={})
+      @connection = SalesforceBulk::Connection.new(username, password, @@SALESFORCE_API_VERSION, opts)
     end
 
     def upsert(sobject, records, external_field)
@@ -22,7 +22,7 @@ module SalesforceBulk
     def update(sobject, records)
       self.do_operation('update', sobject, records, nil)
     end
-    
+
     def create(sobject, records)
       self.do_operation('insert', sobject, records, nil)
     end
